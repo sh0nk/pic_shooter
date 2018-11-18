@@ -44,7 +44,7 @@ class Post extends Component {
   render() {
     var image = '';
     if (this.props.post.filename) {
-      image = (<img src={`http://${apiHostName}/uploads/${this.props.post.filename}`} alt={this.props.post.filename} />);
+      image = (<img src={`http://${apiHostName}/api/file/${this.props.post.filename}`} alt={this.props.post.filename} />);
     }
     return (
       <div className="kakikomi">

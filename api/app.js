@@ -9,7 +9,11 @@ var restify = require('express-restify-mongoose');
 var app = express();
 var router = express.Router();
 
-var mongoHostPort = 'localhost:28001';
+const mongoHost = 'localhost';
+const mongoPort = 28001;
+const mongoDatabaseName = 'app1';
+const mongoUrl = 'mongodb://' + mongoHost + ':' + mongoPort + '/' + mongoDatabaseName;
+const mongoImageCollection = 'imgFiles';
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -17,32 +21,83 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static('public'));
 
-mongoose.connect('mongodb://' + mongoHostPort + '/app1');
+mongoose.connect(mongoUrl);
+const conn = mongoose.connection;
+conn.on('error', function() {console.log('connection error:')});
+var gfs;
+conn.once('open', function() {
+  // Used for reading
+  console.log('connected');
+  gfs = Grid(conn.db, mongoose.mongo);
+});
+
 restify.serve(router, mongoose.model('Post', new mongoose.Schema({
   name: { type: String },
   kakikomi: { type: String },
-  filename: {type: String}
+  filename: { type: String }
 })));
 app.use(router);
 
-/////////////////////////
-///  追加
-/////////////////////////
-var path = require('path');  // ファイルの拡張子を取得するのに使う
+var path = require('path');  // To get file extension
 var multer  = require('multer');
 
-// 格納場所と新しくつけるファイル名の定義
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'public/uploads');
+const Grid = require('gridfs-stream');
+// Grid.mongo = mongoose.mongo;
+console.log(mongoose.connection.db);
+
+// Used for writing
+const GridFsStorage = require('multer-gridfs-storage');
+let storage = GridFsStorage({
+  url: mongoUrl,
+
+  file: (req, file) => {
+    return {
+      filename: 'file_' + Date.now() + path.extname(file.originalname),
+      bucketName: mongoImageCollection
+    }
   },
-  filename: function (req, file, cb) {
-    cb(null, file.fieldname + '_' + Date.now() + path.extname(file.originalname));
-  }
 });
 
+//============================
+//  Download
+//============================
+
+app.get('/api/file/:filename', (req, res) => {
+  // gfs.collection(mongoImageCollection + '.files');
+  gfs.collection(mongoImageCollection);
+  // gfs.exist({filename: req.params.filename}, function(err, found) {
+  //   console.log("exists?");
+  // })
+
+  console.log("looking for a file: " + req.params.filename);
+  gfs.files.find({filename: req.params.filename}).toArray(function(err, files) {
+
+      if(!files || files.length === 0){
+        console.log("file does not exist: " + req.params.filename);
+        console.log(err);
+        return res.status(404).json({
+            responseCode: 1,
+            responseMessage: "error"
+        });
+      }
+      console.log("file exists: " + req.params.filename);
+      // create read stream
+      var readstream = gfs.createReadStream({
+          filename: files[0].filename,
+          root: mongoImageCollection
+      });
+      // set the proper content type 
+      res.set('Content-Type', files[0].contentType)
+      // Return response
+      return readstream.pipe(res);
+  });
+});
+
+//============================
+//  Upload
+//============================
+
 var upload = multer({ storage: storage });
-// ルーティング
 app.post('/api/upload', upload.single('image'), function (req, res, next) {
   delete req.file.buffer; // responseには入れない
   res.json(req.file); // 取得した情報を返す

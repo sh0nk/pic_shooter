@@ -10,10 +10,12 @@
     "debug": "~2.6.9",
     "express": "~4.16.0",
     "express-restify-mongoose": "^5.0.0",
+    "gridfs-stream": "^1.1.1",
     "http-errors": "~1.6.2",
     "jade": "~1.11.0",
     "mongoose": "^5.3.12",
     "morgan": "~1.9.0",
-    "multer": "^1.4.1"
+    "multer": "^1.4.1",
+    "multer-gridfs-storage": "^3.2.3"
   }
 }
