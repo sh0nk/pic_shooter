@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 
+var apiHostName = 'localhost:3000';
 
 /**
 * 画像アップ用のコントロール
@@ -43,7 +44,7 @@ class Post extends Component {
   render() {
     var image = '';
     if (this.props.post.filename) {
-      image = (<img src={`http://localhost:3000/uploads/${this.props.post.filename}`} alt={this.props.post.filename} />);
+      image = (<img src={`http://${apiHostName}/uploads/${this.props.post.filename}`} alt={this.props.post.filename} />);
     }
     return (
       <div className="kakikomi">

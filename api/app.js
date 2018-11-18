@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static('public'));
 
-mongoose.connect('mongodb://' + mongoHostPort + '/app1',{useMongoClient:true});
+mongoose.connect('mongodb://' + mongoHostPort + '/app1');
 restify.serve(router, mongoose.model('Post', new mongoose.Schema({
   name: { type: String },
   kakikomi: { type: String },
@@ -30,6 +30,7 @@ app.use(router);
 /////////////////////////
 var path = require('path');  // ファイルの拡張子を取得するのに使う
 var multer  = require('multer');
+
 // 格納場所と新しくつけるファイル名の定義
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -39,6 +40,7 @@ var storage = multer.diskStorage({
     cb(null, file.fieldname + '_' + Date.now() + path.extname(file.originalname));
   }
 });
+
 var upload = multer({ storage: storage });
 // ルーティング
 app.post('/api/upload', upload.single('image'), function (req, res, next) {
@@ -46,6 +48,11 @@ app.post('/api/upload', upload.single('image'), function (req, res, next) {
   res.json(req.file); // 取得した情報を返す
 });
 /////
+
+// healthcheck
+app.get('/api/healthcheck', function (req, res, next) {
+  res.json({'status': 'ok'});
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -59,6 +66,7 @@ app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
+  console.log(err.message);
 
   // render the error page
   res.status(err.status || 500);
