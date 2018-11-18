@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 
-var apiHostName = 'localhost:3000';
+var apiHostPort = 'localhost:3000';
 
 /**
 * 画像アップ用のコントロール
@@ -44,11 +44,11 @@ class Post extends Component {
   render() {
     var image = '';
     if (this.props.post.filename) {
-      image = (<img src={`http://${apiHostName}/api/file/${this.props.post.filename}`} alt={this.props.post.filename} />);
+      image = (<img src={`http://${apiHostPort}/api/file/${this.props.post.filename}`} alt={this.props.post.filename} />);
     }
     return (
-      <div className="kakikomi">
-        <div>{this.props.post.kakikomi}</div>
+      <div className="comment">
+        <div>{this.props.post.comment}</div>
         {image}
         <p className="name">{this.props.post.name}</p>
       </div>
@@ -79,9 +79,8 @@ class UpForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      kakikomi:'',
-      name:'',
-      message:'書き込んでください',
+      comment:'',
+      message:'画像を送ってください。',
       filename: ''
     };
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -98,15 +97,12 @@ class UpForm extends Component {
         "Accept": "application/json"
       },
       body: JSON.stringify({
-        kakikomi: this.state.kakikomi,
-        name : this.state.name,
+        comment: this.state.comment,
         filename: this.state.filename
       })
     }).then(data => {
       this.setState({
-        message:'アップしました',
-        kakikomi: '',
-        name: '',
+        message:'画像を送信しました。',
         filename: ''
       });
     }).then(() => {this.props.onSubmit()});
@@ -127,10 +123,8 @@ class UpForm extends Component {
       <div className="form">
         <p>{this.state.message}</p>
         <form onSubmit={this.handleSubmit}>
-          <label>内容</label>
-          <textarea name="kakikomi" value={this.state.kakikomi} onChange={this.handleChange}></textarea>
-          <label>名前</label>
-          <input type="text" name="name" value={this.state.name}  onChange={this.handleChange} />
+          <label>コメント</label>
+          <textarea name="comment" value={this.state.comment} onChange={this.handleChange}></textarea>
           <button type="submit">投稿</button>
         </form>
         <label>画像</label>
@@ -147,7 +141,7 @@ class Header extends Component {
   render() {
     return (
       <header>
-      <h1>掲示板</h1>
+      <h1>画像アップローダ</h1>
       </header>
     );
   }
@@ -194,8 +188,8 @@ class App extends Component {
 */
 function getPost(callback) {
   fetch('/api/v1/Post?sort={"_id":-1}')
-  .then(response => response.json())
-  .then((data) => {callback(data)});
+    .then(response => response.json())
+    .then((data) => {callback(data)});
 }
 
 export default App;

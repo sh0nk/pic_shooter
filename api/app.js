@@ -32,8 +32,7 @@ conn.once('open', function() {
 });
 
 restify.serve(router, mongoose.model('Post', new mongoose.Schema({
-  name: { type: String },
-  kakikomi: { type: String },
+  comment: { type: String },
   filename: { type: String }
 })));
 app.use(router);
