@@ -6,14 +6,26 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var restify = require('express-restify-mongoose');
 
+
+//============================
+//  Global settings
+//============================
+
 var app = express();
 var router = express.Router();
+const io = app.io = require('socket.io')();
 
-const mongoHost = 'localhost';
-const mongoPort = 28001;
-const mongoDatabaseName = 'app1';
-const mongoUrl = 'mongodb://' + mongoHost + ':' + mongoPort + '/' + mongoDatabaseName;
-const mongoImageCollection = 'imgFiles';
+// CORS
+io.set('origins', '*:*');
+
+io.on('connection', (socket) => {
+  console.log('socket.io connected');
+
+  socket.on('image sent', (msg) => {
+    console.log('socket.io invoked');
+    // io.emit('image received', msg);
+  });
+});
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -21,13 +33,25 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static('public'));
 
+
+
+//============================
+//  Mongo settings
+//============================
+
+const mongoHost = 'localhost';
+const mongoPort = 28001;
+const mongoDatabaseName = 'app1';
+const mongoUrl = 'mongodb://' + mongoHost + ':' + mongoPort + '/' + mongoDatabaseName;
+const mongoImageCollection = 'imgFiles';
+
 mongoose.connect(mongoUrl);
 const conn = mongoose.connection;
-conn.on('error', function() {console.log('connection error:')});
 var gfs;
+conn.on('error', function() {console.log('connection error:')});
 conn.once('open', function() {
   // Used for reading
-  console.log('connected');
+  console.log('mongo.db connected');
   gfs = Grid(conn.db, mongoose.mongo);
 });
 
@@ -50,10 +74,16 @@ let storage = GridFsStorage({
   url: mongoUrl,
 
   file: (req, file) => {
-    return {
-      filename: 'file_' + Date.now() + path.extname(file.originalname),
-      bucketName: mongoImageCollection
-    }
+    return new Promise((resolve, reject) => {
+      const filename = 'file_' + Date.now() + path.extname(file.originalname);
+      io.emit('image received', filename);
+      console.log('image received! file:' + filename);
+
+      resolve({
+        filename: filename,
+        bucketName: mongoImageCollection,
+      });
+    });
   },
 });
 

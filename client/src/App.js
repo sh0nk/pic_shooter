@@ -4,40 +4,6 @@ import './App.css';
 var apiHostPort = 'localhost:3000';
 
 /**
-* 画像アップ用のコントロール
-*/
-class ImageUpload extends Component {
-  constructor(props) {
-    super(props);
-    this.handleChange = this.handleChange.bind(this);
-  }
-
-  handleChange = (e) => {
-    e.preventDefault();
-    var form = new FormData();
-    form.append('image',e.target.files[0]);
-
-    fetch('/api/upload', {
-      method: "POST",
-      body: form
-    }).then(
-      response => response.json()
-    ).then(
-      data => {
-      this.props.onChange(data.filename);
-    });
-  }
-
-  render() {
-    return (
-      <div>
-        <input type="file" name="image" onChange={this.handleChange} />
-      </div>
-    );
-  }
-}
-
-/**
 * 書き込み１件
 */
 class Post extends Component {
@@ -72,6 +38,33 @@ class List extends Component {
 }
 
 /**
+* 画像アップ用のコントロール
+*/
+class ImageUpload extends Component {
+  constructor(props) {
+    super(props);
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange = (e) => {
+    e.preventDefault();
+    var form = new FormData();
+    form.append('image', e.target.files[0]);
+
+    this.props.onChange(form);
+  }
+
+  render() {
+    return (
+      <div>
+        <input type="file" name="image" accept="image/*" onChange={this.handleChange} />
+      </div>
+    );
+  }
+}
+
+
+/**
 * 投稿フォーム
 */
 class UpForm extends Component {
@@ -81,15 +74,42 @@ class UpForm extends Component {
     this.state = {
       comment:'',
       message:'画像を送ってください。',
-      filename: ''
+      fileForm: null,
+      filename: '',
     };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.handleFile = this.handleFile.bind(this);
+    this.handleFileAttached = this.handleFileAttached.bind(this);
+    this.handleSubmitComment = this.handleSubmitComment.bind(this);
+  }
+
+  handleUploadFile() {
+    console.log('uploading file');
+
+    fetch('/api/upload', {
+      method: "POST",
+      body: this.state.fileForm,
+    }).then(
+      response => response.json()
+    ).then(
+      data => {
+        console.log(data.filename);
+        this.setState({
+          filename: data.filename,
+        });
+
+        this.handleSubmitComment();
+      }
+    );
   }
 
   handleSubmit = (e) => {
     e.preventDefault();
+
+    this.handleUploadFile();
+  }
+
+  handleSubmitComment() {
     fetch('/api/v1/Post', {
       method : "POST",
       headers: {
@@ -109,13 +129,14 @@ class UpForm extends Component {
   }
 
   handleChange = (e) => {
-    this.setState({message:''});
+    this.setState({ message: '' });
     this.setState({ [e.target.name] :e.target.value});
   }
 
-  handleFile = (filename) => {
-    console.log(filename);
-    this.setState({filename : filename});
+  handleFileAttached = (fileForm) => {
+    this.setState({
+      fileForm: fileForm,
+    });
   }
 
   render() {
@@ -128,7 +149,7 @@ class UpForm extends Component {
           <button type="submit">投稿</button>
         </form>
         <label>画像</label>
-        <ImageUpload onChange={this.handleFile}/>
+        <ImageUpload onChange={this.handleFileAttached}/>
       </div>
     );
   }

@@ -20,6 +20,10 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+// socket.io settings
+// Need to be here for integration of express-builder and socket.io
+var io = app.io;
+io.attach(server);
 
 /**
  * Listen on provided port, on all network interfaces.
