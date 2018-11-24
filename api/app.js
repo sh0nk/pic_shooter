@@ -6,6 +6,11 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var restify = require('express-restify-mongoose');
 
+var path = require('path');  // To get file extension
+var multer  = require('multer');  // multipart form handling
+var Grid = require('gridfs-stream');
+var GridFsStorage = require('multer-gridfs-storage');
+
 
 //============================
 //  Global settings
@@ -55,21 +60,17 @@ conn.once('open', function() {
   gfs = Grid(conn.db, mongoose.mongo);
 });
 
+// Model registration
+// TODO: better to be a separated file
 restify.serve(router, mongoose.model('Post', new mongoose.Schema({
   comment: { type: String },
   filename: { type: String }
 })));
 app.use(router);
 
-var path = require('path');  // To get file extension
-var multer  = require('multer');
-
-const Grid = require('gridfs-stream');
-// Grid.mongo = mongoose.mongo;
 console.log(mongoose.connection.db);
 
 // Used for writing
-const GridFsStorage = require('multer-gridfs-storage');
 let storage = GridFsStorage({
   url: mongoUrl,
 
@@ -101,7 +102,7 @@ app.get('/api/file/:filename', (req, res) => {
   console.log("looking for a file: " + req.params.filename);
   gfs.files.find({filename: req.params.filename}).toArray(function(err, files) {
 
-      if(!files || files.length === 0){
+      if (!files || files.length === 0){
         console.log("file does not exist: " + req.params.filename);
         console.log(err);
         return res.status(404).json({
@@ -128,8 +129,8 @@ app.get('/api/file/:filename', (req, res) => {
 
 var upload = multer({ storage: storage });
 app.post('/api/upload', upload.single('image'), function (req, res, next) {
-  delete req.file.buffer; // responseには入れない
-  res.json(req.file); // 取得した情報を返す
+  delete req.file.buffer; // do not include in response
+  res.json(req.file);
 });
 /////
 

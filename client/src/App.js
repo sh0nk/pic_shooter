@@ -1,45 +1,11 @@
 import React, { Component } from 'react';
 import './App.css';
 
-var apiHostPort = 'localhost:3000';
+require('dotenv').config();
 
-/**
-* 書き込み１件
-*/
-class Post extends Component {
-  render() {
-    var image = '';
-    if (this.props.post.filename) {
-      image = (<img src={`http://${apiHostPort}/api/file/${this.props.post.filename}`} alt={this.props.post.filename} />);
-    }
-    return (
-      <div className="comment">
-        <div>{this.props.post.comment}</div>
-        {image}
-        <p className="name">{this.props.post.name}</p>
-      </div>
-    );
-  }
-}
+console.log(process.env);
 
-/**
-* 書き込みリスト
-*/
-class List extends Component {
-  // 書き込みリスト
-  render() {
-    const posts = this.props.posts;
-    var list = [];
-    for (var i in posts) {
-      list.push( <li key={i}><Post post={posts[i]} /></li> );
-    }
-    return (<ul>{list}</ul>);
-  }
-}
 
-/**
-* 画像アップ用のコントロール
-*/
 class ImageUpload extends Component {
   constructor(props) {
     super(props);
@@ -50,8 +16,9 @@ class ImageUpload extends Component {
     e.preventDefault();
     var form = new FormData();
     form.append('image', e.target.files[0]);
+    var url = URL.createObjectURL(e.target.files[0]);
 
-    this.props.onChange(form);
+    this.props.onChange(form, url);
   }
 
   render() {
@@ -63,10 +30,17 @@ class ImageUpload extends Component {
   }
 }
 
+class ImagePreview extends Component {
+  render() {
+    if (this.props.fileUrl) {
+      return (<img src={this.props.fileUrl} alt="preview"/>);
+    }
+    return null;
+  }
 
-/**
-* 投稿フォーム
-*/
+}
+
+
 class UpForm extends Component {
 
   constructor(props) {
@@ -75,6 +49,7 @@ class UpForm extends Component {
       comment:'',
       message:'画像を送ってください。',
       fileForm: null,
+      fileUrl: null,
       filename: '',
     };
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -98,6 +73,7 @@ class UpForm extends Component {
           filename: data.filename,
         });
 
+        console.log('image:' + data.filename + ' send done.');
         this.handleSubmitComment();
       }
     );
@@ -121,11 +97,12 @@ class UpForm extends Component {
         filename: this.state.filename
       })
     }).then(data => {
+      console.log('metadata for image:' + this.state.filename + ' send done.');
       this.setState({
-        message:'画像を送信しました。',
+        message: '画像を送信しました。',
         filename: ''
       });
-    }).then(() => {this.props.onSubmit()});
+    });
   }
 
   handleChange = (e) => {
@@ -133,9 +110,10 @@ class UpForm extends Component {
     this.setState({ [e.target.name] :e.target.value});
   }
 
-  handleFileAttached = (fileForm) => {
+  handleFileAttached = (fileForm, fileUrl) => {
     this.setState({
       fileForm: fileForm,
+      fileUrl: fileUrl,
     });
   }
 
@@ -143,21 +121,20 @@ class UpForm extends Component {
     return  (
       <div className="form">
         <p>{this.state.message}</p>
-        <form onSubmit={this.handleSubmit}>
-          <label>コメント</label>
-          <textarea name="comment" value={this.state.comment} onChange={this.handleChange}></textarea>
-          <button type="submit">投稿</button>
-        </form>
         <label>画像</label>
         <ImageUpload onChange={this.handleFileAttached}/>
+        <ImagePreview fileUrl={this.state.fileUrl} />
+        <form onSubmit={this.handleSubmit}>
+          <label>コメント</label>
+          <textarea name="comment" value={this.state.comment} 
+                    onChange={(form, url) => this.handleChange(form, url)}></textarea>
+          <button type="submit">投稿</button>
+        </form>
       </div>
     );
   }
 }
 
-/**
-* ヘッダー
-*/
 class Header extends Component {
   render() {
     return (
@@ -168,49 +145,15 @@ class Header extends Component {
   }
 }
 
-/**
-* 全画面
-*/
 class App extends Component {
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      posts: []
-    };
-    this.updatePosts();
-
-    this.updatePosts = this.updatePosts.bind(this);
-  }
-
-  updatePosts(e) {
-    getPost((data) => {
-      this.setState({posts: data});
-    });
-  }
-
   render() {
-    // this.updatePosts();
     return (
       <div className="App">
       <Header />
-      <UpForm onSubmit={this.updatePosts}/>
-      <List posts={this.state.posts}/>
+      <UpForm />
       </div>
     );
   }
-}
-
-/**
-* サーバーから書き込み一覧を取得する
-* @method getPost
-* @param  {Function} callback データ取得後のコールバック
-* @return {[type]}
-*/
-function getPost(callback) {
-  fetch('/api/v1/Post?sort={"_id":-1}')
-    .then(response => response.json())
-    .then((data) => {callback(data)});
 }
 
 export default App;

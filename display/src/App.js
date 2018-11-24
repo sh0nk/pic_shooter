@@ -2,12 +2,14 @@ import React, { Component } from 'react';
 import io from 'socket.io-client';
 import './App.css';
 
-var apiHostPort = 'localhost:3000';
-var ioHostPort = 'localhost:3000';
 
-/**
-* 書き込み１件
-*/
+require('dotenv').config();
+
+console.log(process.env);
+
+const apiHostPort = process.env.REACT_APP_API_ADDR;
+const ioHostPort = process.env.REACT_APP_API_ADDR;
+
 class Post extends Component {
   render() {
     var image = '';
@@ -19,15 +21,11 @@ class Post extends Component {
       <div className="comment">
         <div>{this.props.post.comment}</div>
         {image}
-        <p className="name">{this.props.post.name}</p>
       </div>
     );
   }
 }
 
-/**
-* 書き込みリスト
-*/
 class List extends Component {
   // 書き込みリスト
   render() {
@@ -41,9 +39,6 @@ class List extends Component {
 }
 
 
-/**
-* ヘッダー
-*/
 class Header extends Component {
   render() {
     return (
@@ -54,9 +49,6 @@ class Header extends Component {
   }
 }
 
-/**
-* 全画面
-*/
 class App extends Component {
   constructor(props) {
     super(props);
@@ -66,27 +58,41 @@ class App extends Component {
     this.updatePosts();
 
     this.socket = io(ioHostPort);
-
     this.socket.on('image received', filename => {
       console.log('image received');
       console.log(filename);
-      this.prependNewImage(filename); // TODO: change to load only one target image?
+
+      // delayed call to ensure the entry existence
+      setTimeout(() => {
+        getOnePost(filename, (receiptData) => {
+          console.log('metadata receipt: ');
+          console.log(receiptData);
+
+          // TODO: change to load only one target image?
+          if (receiptData != null && receiptData.length === 1) {
+            this.prependNewImage(filename, receiptData[0].comment);
+          } else {
+            console.log("metadata has something wrong.");
+          }
+        });
+      }, 1000);
     });
 
     this.updatePosts = this.updatePosts.bind(this);
   }
 
-  prependNewImage(filename) {
+  prependNewImage(filename, comment) {
     console.log('prepend');
     const posts = this.state.posts.slice();
     posts.unshift({
-      filename: filename
+      filename: filename,
+      comment: comment,
     });
     this.setState({posts: posts});
   }
 
   updatePosts(e) {
-    getPost((data) => {
+    getPostList((data) => {
       console.log('set state');
       console.log(data);
       this.setState({posts: data});
@@ -104,14 +110,14 @@ class App extends Component {
   }
 }
 
-/**
-* サーバーから書き込み一覧を取得する
-* @method getPost
-* @param  {Function} callback データ取得後のコールバック
-* @return {[type]}
-*/
-function getPost(callback) {
+function getPostList(callback) {
   fetch('/api/v1/Post?sort={"_id":-1}')
+    .then(response => response.json())
+    .then((data) => {callback(data)});
+}
+
+function getOnePost(filename, callback) {
+  fetch('/api/v1/Post?query={"filename":"' + filename + '"}')
     .then(response => response.json())
     .then((data) => {callback(data)});
 }
