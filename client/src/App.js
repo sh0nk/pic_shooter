@@ -6,19 +6,66 @@ require('dotenv').config();
 console.log(process.env);
 
 
-class ImageUpload extends Component {
+function urlToFile(url) {
+  var blobBin = atob(url.split(',')[1]);
+  var array = [];
+  for (var i = 0; i < blobBin.length; i++) {
+    array.push(blobBin.charCodeAt(i));
+  }
+  return new Blob([new Uint8Array(array)], {type: 'image/jpeg', name:'somefile.jpeg'});
+}
+
+class ImageAttach extends Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
   }
 
+  resizeImage = (file) => {
+    console.log('resizing file' + file);
+    
+    var img = document.createElement("img");
+    var reader = new FileReader();
+    var onChange = this.props.onChange;
+    reader.onload = function(e) {
+      img.src = e.target.result;
+
+      img.onload = function(e) {
+        var canvas = document.createElement("canvas");
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        var FIXED_WIDTH = 1024;
+        var FIXED_HEIGHT = 768;
+        var w = img.width;
+        var h = img.height;
+        if (w > h) {
+          h *= FIXED_WIDTH / w;
+          w = FIXED_WIDTH;
+        } else {
+          w *= FIXED_HEIGHT / h;
+          h = FIXED_HEIGHT;
+        }
+        canvas.width = w;
+        canvas.height = h;
+        console.log("height " + h + " width " + w);
+  
+        var ctx2 = canvas.getContext("2d");
+        ctx2.drawImage(img, 0, 0, w, h);
+  
+        var url = canvas.toDataURL("image/jpeg");
+
+        // console.log(url);
+        onChange(url);
+      }
+    }
+    reader.readAsDataURL(file);
+  }
+
   handleChange = (e) => {
     e.preventDefault();
-    var form = new FormData();
-    form.append('image', e.target.files[0]);
-    var url = URL.createObjectURL(e.target.files[0]);
+    var image = e.target.files[0];
 
-    this.props.onChange(form, url);
+    this.resizeImage(image);
   }
 
   render() {
@@ -110,9 +157,12 @@ class UpForm extends Component {
     this.setState({ [e.target.name] :e.target.value});
   }
 
-  handleFileAttached = (fileForm, fileUrl) => {
+  handleFileAttached = (fileUrl) => {
+    var form = new FormData();
+    form.append('image', urlToFile(fileUrl));
+
     this.setState({
-      fileForm: fileForm,
+      fileForm: form,
       fileUrl: fileUrl,
     });
   }
@@ -122,7 +172,7 @@ class UpForm extends Component {
       <div className="form">
         <p>{this.state.message}</p>
         <label>画像</label>
-        <ImageUpload onChange={this.handleFileAttached}/>
+        <ImageAttach onChange={this.handleFileAttached}/>
         <ImagePreview fileUrl={this.state.fileUrl} />
         <form onSubmit={this.handleSubmit}>
           <label>コメント</label>
