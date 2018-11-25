@@ -11,6 +11,8 @@ var multer  = require('multer');  // multipart form handling
 var Grid = require('gridfs-stream');
 var GridFsStorage = require('multer-gridfs-storage');
 
+require('dotenv').config();
+
 
 //============================
 //  Global settings
@@ -44,11 +46,11 @@ app.use(express.static('public'));
 //  Mongo settings
 //============================
 
-const mongoHost = 'localhost';
-const mongoPort = 28001;
-const mongoDatabaseName = 'app1';
-const mongoUrl = 'mongodb://' + mongoHost + ':' + mongoPort + '/' + mongoDatabaseName;
-const mongoImageCollection = 'imgFiles';
+const mongoHostPort     = process.env.MONGO_ADDR;
+const mongoDatabaseName = process.env.MONGO_DB_NAME;
+const mongoImageCollection = process.env.MONGO_COL_NAME;
+
+const mongoUrl = 'mongodb://' + mongoHostPort + '/' + mongoDatabaseName;
 
 mongoose.connect(mongoUrl);
 const conn = mongoose.connection;
