@@ -23,7 +23,7 @@ class ImageAttach extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectButtonMsg: "写真を選んでください",
+      selectButtonMsg: "送信する写真を選んでください",
       selectButtonDisabled: false,
       selectButtonId: "imgselect"
     }
@@ -77,7 +77,7 @@ class ImageAttach extends Component {
     if (image) {
       this.resizeImage(image);
       this.setState({
-        selectButtonMsg: "画像をタップしてアップロード",
+        selectButtonMsg: "写真をタップしてアップロード",
         selectButtonDisabled: true,
         selectButtonId: "imgselect_disabled",
       });
@@ -117,11 +117,15 @@ class ImagePreview extends Component {
   }
 
   handleClick(e) {
-    this.props.onClick(e);
-    this.setState({
-      animationStarted: true
-    });
-    console.log("animation started");
+    if (!this.state.animationStarted) {
+      this.props.onClick(e);
+      this.setState({
+        animationStarted: true
+      });
+      console.log("animation started");
+    } else {
+      console.log("animation was already started. nothing to do.");
+    }
   }
 
   render() {
@@ -148,19 +152,18 @@ class ImagePreview extends Component {
             })}
             >
             {(innerState) => (
-            <div id='preview' class="text-center"
-            style={{
-              transform: `translate(0, ${innerState.y}px)`,
-              WebkitTransform: `translate(0, ${innerState.y}px)`,
-              opacity: innerState.opacity
-            }}
-
-            >
-              <img src={this.props.fileUrl} alt="preview" id="preview"
-                  onClick={this.handleClick} 
-                  />
-            </div>
-          )}
+              <div id='preview' class="text-center"
+                style={{
+                  transform: `translate(0, ${innerState.y}px)`,
+                  WebkitTransform: `translate(0, ${innerState.y}px)`,
+                  opacity: innerState.opacity
+                }}
+              >
+                <img src={this.props.fileUrl} alt="preview" id="preview"
+                    onClick={this.handleClick} 
+                />
+              </div>
+            )}
           </Animate>
         </Col>
         
@@ -187,6 +190,7 @@ class UpForm extends Component {
       fileForm: null,
       fileUrl: null,
       filename: '',
+      textAreaReadOnly: false,
     };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -218,6 +222,9 @@ class UpForm extends Component {
   handleSubmit = (e) => {
     console.log('uploading file2');
     e.preventDefault();
+
+    console.log("freezing text area");
+    this.setState({ textAreaReadOnly: true });
 
     this.handleUploadFile();
   }
@@ -257,6 +264,7 @@ class UpForm extends Component {
     });
   }
 
+
   render() {
     return  (
       <div className="form">
@@ -268,12 +276,14 @@ class UpForm extends Component {
                         onClick={this.handleSubmit} />
         </Row>
         <Row>
-          <form onSubmit={this.handleSubmit}>
-            <div class="text-center">
+          <form>
+            <div className="text-center">
               <textarea name="comment" value={this.state.comment}
                         placeholder="コメントを入力..." 
                         className="textform"
+                        readOnly={this.state.textAreaReadOnly}
                         onChange={(form, url) => this.handleChange(form, url)}></textarea>
+              送信がうまくいかない場合や、複数枚送信したい場合はページをリロードして下さい。
             </div>
           </form>
         </Row>
