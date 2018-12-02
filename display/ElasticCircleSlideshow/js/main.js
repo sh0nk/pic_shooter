@@ -297,9 +297,10 @@
 			contentEl = item.querySelector('.slide__content'),
 			largeImgEl = contentEl.querySelector('.slide__img--large'),
 			titleEl = contentEl.querySelector('.slide__title--main'),
-			descriptionEl = contentEl.querySelector('.slide__description'),
-			priceEl = contentEl.querySelector('.slide__price'),
-			buyEl = contentEl.querySelector('.button--buy');
+			// descriptionEl = contentEl.querySelector('.slide__description'),
+			messageEl = contentEl.querySelector('.slide__message');
+			// buyEl = contentEl.querySelector('.button--buy');
+		
 
 		// add slide--open class to the item
 		classie.add(item, 'slide--open');
@@ -313,11 +314,11 @@
 		// - title
 		dynamics.css(titleEl, {translateY : 600, opacity: 0});
 		// - description
-		dynamics.css(descriptionEl, {translateY : 400, opacity: 0});
-		// - price
-		dynamics.css(priceEl, {translateY : 400, opacity: 0});
+		// dynamics.css(descriptionEl, {translateY : 400, opacity: 0});
+		// - message
+		dynamics.css(messageEl, {translateY : 400, opacity: 0});
 		// - buy button
-		dynamics.css(buyEl, {translateY : 400, opacity: 0});
+		// dynamics.css(buyEl, {translateY : 400, opacity: 0});
 
 		// animate (scale up) the expander element
 		dynamics.animate(expanderEl, 
@@ -360,17 +361,17 @@
 		);
 
 		// animate the description element in
-		dynamics.animate(descriptionEl, 
-			{
-				translateY : 0, opacity : 1
-			}, 
-			{
-				type: dynamics.bezier, points: [{"x":0,"y":0,"cp":[{"x":0.2,"y":1}]},{"x":1,"y":1,"cp":[{"x":0.3,"y":1}]}], duration: 1000, delay: 500
-			}
-		);
+		// dynamics.animate(descriptionEl, 
+		// 	{
+		// 		translateY : 0, opacity : 1
+		// 	}, 
+		// 	{
+		// 		type: dynamics.bezier, points: [{"x":0,"y":0,"cp":[{"x":0.2,"y":1}]},{"x":1,"y":1,"cp":[{"x":0.3,"y":1}]}], duration: 1000, delay: 500
+		// 	}
+		// );
 
-		// animate the price element in
-		dynamics.animate(priceEl, 
+		// animate the message element in
+		dynamics.animate(messageEl, 
 			{
 				translateY : 0, opacity : 1
 			}, 
@@ -380,27 +381,27 @@
 		);
 
 		// animate the buy element in
-		dynamics.animate(buyEl, 
-			{
-				translateY : 0, opacity : 1
-			}, 
-			{
-				type: dynamics.bezier, points: [{"x":0,"y":0,"cp":[{"x":0.2,"y":1}]},{"x":1,"y":1,"cp":[{"x":0.3,"y":1}]}], duration: 1000, delay: 700,
-				complete: function() {
-					// add .noscroll to body and .scrollable to .slide__content
-					classie.add(bodyEl, 'noscroll');
-					classie.add(contentEl, 'scrollable');
+		// dynamics.animate(buyEl, 
+		// 	{
+		// 		translateY : 0, opacity : 1
+		// 	}, 
+		// 	{
+		// 		type: dynamics.bezier, points: [{"x":0,"y":0,"cp":[{"x":0.2,"y":1}]},{"x":1,"y":1,"cp":[{"x":0.3,"y":1}]}], duration: 1000, delay: 700,
+		// 		complete: function() {
+		// 			// add .noscroll to body and .scrollable to .slide__content
+		// 			classie.add(bodyEl, 'noscroll');
+		// 			classie.add(contentEl, 'scrollable');
 					
-					// force redraw (chrome)
-					contentEl.style.display = 'none';
-					contentEl.offsetHeight;
-					contentEl.style.display = 'block';
+		// 			// force redraw (chrome)
+		// 			contentEl.style.display = 'none';
+		// 			contentEl.offsetHeight;
+		// 			contentEl.style.display = 'block';
 					
-					// allow scrolling
-					classie.remove(bodyEl, 'lockscroll');
-				}
-			}
-		);
+		// 			// allow scrolling
+		// 			classie.remove(bodyEl, 'lockscroll');
+		// 		}
+		// 	}
+		// );
 	};
 
 	CircleSlideshow.prototype._closeContent = function() {
@@ -413,9 +414,9 @@
 			contentEl = item.querySelector('.slide__content'),
 			largeImgEl = contentEl.querySelector('.slide__img--large'),
 			titleEl = contentEl.querySelector('.slide__title--main'),
-			descriptionEl = contentEl.querySelector('.slide__description'),
-			priceEl = contentEl.querySelector('.slide__price'),
-			buyEl = contentEl.querySelector('.button--buy');
+			// descriptionEl = contentEl.querySelector('.slide__description'),
+			messageEl = contentEl.querySelector('.slide__message'); //,
+			// buyEl = contentEl.querySelector('.button--buy');
 
 		// add slide--close class to the item
 		classie.add(item, 'slide--close');
@@ -425,19 +426,19 @@
 		classie.remove(contentEl, 'scrollable');
 
 		// animate the buy element out
-		dynamics.stop(buyEl);
-		dynamics.animate(buyEl, 
-			{
-				translateY : 400, opacity : 0
-			}, 
-			{
-				type: dynamics.bezier, points: [{"x":0,"y":0,"cp":[{"x":0.2,"y":1}]},{"x":1,"y":1,"cp":[{"x":0.3,"y":1}]}], duration: 1000
-			}
-		);
+		// dynamics.stop(buyEl);
+		// dynamics.animate(buyEl, 
+		// 	{
+		// 		translateY : 400, opacity : 0
+		// 	}, 
+		// 	{
+		// 		type: dynamics.bezier, points: [{"x":0,"y":0,"cp":[{"x":0.2,"y":1}]},{"x":1,"y":1,"cp":[{"x":0.3,"y":1}]}], duration: 1000
+		// 	}
+		// );
 
-		// animate the price element out
-		dynamics.stop(priceEl);
-		dynamics.animate(priceEl, 
+		// animate the message element out
+		dynamics.stop(messageEl);
+		dynamics.animate(messageEl, 
 			{
 				translateY : 400, opacity : 0
 			}, 
@@ -447,15 +448,15 @@
 		);
 
 		// animate the description element out
-		dynamics.stop(descriptionEl);
-		dynamics.animate(descriptionEl, 
-			{
-				translateY : 400, opacity : 0
-			}, 
-			{
-				type: dynamics.bezier, points: [{"x":0,"y":0,"cp":[{"x":0.2,"y":1}]},{"x":1,"y":1,"cp":[{"x":0.3,"y":1}]}], duration: 1000, delay: 100
-			}
-		);
+		// dynamics.stop(descriptionEl);
+		// dynamics.animate(descriptionEl, 
+		// 	{
+		// 		translateY : 400, opacity : 0
+		// 	}, 
+		// 	{
+		// 		type: dynamics.bezier, points: [{"x":0,"y":0,"cp":[{"x":0.2,"y":1}]},{"x":1,"y":1,"cp":[{"x":0.3,"y":1}]}], duration: 1000, delay: 100
+		// 	}
+		// );
 
 		// animate the title element out
 		dynamics.stop(titleEl);
