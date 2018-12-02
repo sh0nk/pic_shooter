@@ -1,11 +1,59 @@
+html, body {
+    /* height: 100vh; */
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    position: fixed;
+
+}
+
+/* html {
+    overflow: hidden;
+}
+
 body {
-  margin: 0;
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    overflow: auto;
+} */
+
+body {
+    margin: 0;
+    padding: 20px;
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+.body {
+    background-image: url("/blurred-background-close-up-flowers.jpg");
+    background-position: center center;
+    background-size: cover;
+}
+@media screen and (min-width: 768px) {
+    .body {
+      background-attachment: fixed;
+    }
+}
+.body:before {
+    content: '';
+    background: inherit;
+    -webkit-filter: blur(2px);
+    -moz-filter: blur(2px);
+    -o-filter: blur(2px);
+    -ms-filter: blur(2px);
+    filter: blur(2px);
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    z-index: -1;
+}
+
+h2 {
+    font-family: "Sacramento", Arial, serif;
+    font-size: 20;
 }
 
 header {
-    margin-bottom:40px;
+    font: 16px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 ul {
@@ -20,16 +68,70 @@ nav ul li {
     margin-right: 20px;
 }
 
+#preview {
+    max-width: 100%;
+    width: 100%;
+    max-height: 80%;
+    height: 80%;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+#imgselect {
+    display: inline-block;
+    padding: 0.5em 1.5em;
+    text-decoration: none;
+    color: #ff67cf;
+    border: solid 2px #ff67cf;
+    background-color: #fff;
+    border-radius: 3px;
+    transition: .4s;
+}
+#imgselect:hover {
+    background: #ff67cf;
+    color: white;
+}
+
+#imgselect_disabled {
+    display: inline-block;
+    padding: 0.5em 1.5em;
+    text-decoration: none;
+    color: #fff;
+    border: solid 2px #fff;
+    background-color: #888;
+    border-radius: 3px;
+    transition: .4s;
+}
+
+.imgselect_inner {
+    display: none !important;
+}
+
+.textform {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    width: 100%;
+}
+
+
+:placeholder-shown {
+    color: white;
+}
+::-webkit-input-placeholder {
+    color: white;
+}
+
 .kakikomi {
     border: 1px solid #888;
     padding:20px;
     margin-bottom: 40px;
 }
 
-.kakikomi div {
-}
-
 .kakikomi .name {
     font-size:0.8em;
     color: #555;
 }
+

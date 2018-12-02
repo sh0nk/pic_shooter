@@ -3,9 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "d3-ease": "^1.0.5",
     "dotenv": "^6.1.0",
     "react": "^16.6.3",
+    "react-bootstrap": "^0.32.4",
     "react-dom": "^16.6.3",
+    "react-hammerjs": "^1.0.1",
+    "react-move": "^2.8.0",
     "react-scripts": "2.1.1",
     "socket.io": "^2.1.1",
     "socket.io-client": "^2.1.1"

@@ -1,4 +1,8 @@
 import React, { Component } from 'react';
+import {Grid, Row, Col} from 'react-bootstrap';
+// import Hammer from 'react-hammerjs';
+import { Animate } from 'react-move';
+import { easePolyIn } from 'd3-ease';  // For react-move
 import './App.css';
 
 require('dotenv').config();
@@ -15,9 +19,15 @@ function urlToFile(url) {
   return new Blob([new Uint8Array(array)], {type: 'image/jpeg', name:'somefile.jpeg'});
 }
 
+
 class ImageAttach extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      selectButtonMsg: "写真を選んでください",
+      selectButtonDisabled: false,
+      selectButtonId: "imgselect"
+    }
     this.handleChange = this.handleChange.bind(this);
   }
 
@@ -65,24 +75,118 @@ class ImageAttach extends Component {
     e.preventDefault();
     var image = e.target.files[0];
 
-    this.resizeImage(image);
+    if (image) {
+      this.resizeImage(image);
+      this.setState({
+        selectButtonMsg: "画像をタップしてアップロード",
+        selectButtonDisabled: true,
+        selectButtonId: "imgselect_disabled",
+      });
+    }
   }
 
   render() {
     return (
-      <div>
-        <input type="file" name="image" accept="image/*" onChange={this.handleChange} />
-      </div>
+      <Col md={12}>
+        <div className="center-block text-center">
+          <label id={this.state.selectButtonId} htmlFor="imgcont">{this.state.selectButtonMsg}
+            <input type="file" id="imgcont" className="imgselect_inner"
+                    disabled={this.state.selectButtonDisabled}
+                    name="image" accept="image/*" onChange={this.handleChange} />
+          </label>
+        </div>
+      </Col>
     );
   }
 }
 
 class ImagePreview extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      deltaY: 0,
+      animationStarted: false
+    };
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  onPan(ev) {
+    console.log('panning now: ' + ev.deltaX);
+    this.setState({
+      deltaY: ev.deltaY,
+    });
+  }
+
+  handleClick(e) {
+    this.props.onClick(e);
+    this.setState({
+      animationStarted: true
+    });
+    console.log("animation started");
+  }
+
   render() {
     if (this.props.fileUrl) {
-      return (<img src={this.props.fileUrl} alt="preview"/>);
+      // const options = {
+      //   touchAction: 'compute',
+      //   recognizers: {
+      //     pan: {
+      //       enable: true,
+      //       // direction: 'DIRECTION_ALL', // direction peroperty does not work somehow
+      //       threshold: 10,
+      //     }
+      //   }
+      // };
+
+      return (
+        <Col md={12}>
+          {/* <Hammer onPan={this.onPan.bind(this)}
+              options={options}> */}
+          <Animate
+            start={() => ({
+              y: 0,
+              opacity: 1
+            })}
+            update={() => ({
+              y: [this.state.animationStarted ? -1000 : 0],
+              opacity: [this.state.animationStarted ? 0 : 1],
+              timing: { 
+                delay: 500,
+                duration: 2000, 
+                ease: easePolyIn
+              }
+            })}
+            leave={() => ({
+              opacity: 0
+            })}
+            >
+            {(innerState) => (
+            <div id='preview' class="text-center"
+            style={{
+              // position: 'absolute',
+              transform: `translate(0, ${innerState.y}px)`,
+              WebkitTransform: `translate(0, ${innerState.y}px)`,
+              opacity: innerState.opacity
+            }}
+
+            >
+              <img src={this.props.fileUrl} alt="preview" id="preview"
+                  onClick={this.handleClick} 
+                  />
+            </div>
+          )}
+          </Animate>
+          {/* </Hammer> */}
+        </Col>
+        
+      );
+    } else {
+      return (
+        <Col md={12}>
+          <div id='preview'></div>
+        </Col>
+      );
     }
-    return null;
   }
 
 }
@@ -127,6 +231,7 @@ class UpForm extends Component {
   }
 
   handleSubmit = (e) => {
+    console.log('uploading file2');
     e.preventDefault();
 
     this.handleUploadFile();
@@ -170,16 +275,23 @@ class UpForm extends Component {
   render() {
     return  (
       <div className="form">
-        <p>{this.state.message}</p>
-        <label>画像</label>
-        <ImageAttach onChange={this.handleFileAttached}/>
-        <ImagePreview fileUrl={this.state.fileUrl} />
-        <form onSubmit={this.handleSubmit}>
-          <label>コメント</label>
-          <textarea name="comment" value={this.state.comment} 
-                    onChange={(form, url) => this.handleChange(form, url)}></textarea>
-          <button type="submit">投稿</button>
-        </form>
+        <Row>
+          <ImageAttach onChange={this.handleFileAttached}/>
+        </Row>
+        <Row>
+          <ImagePreview fileUrl={this.state.fileUrl}
+                        onClick={this.handleSubmit} />
+        </Row>
+        <Row>
+          <form onSubmit={this.handleSubmit}>
+            <div class="text-center">
+              <textarea name="comment" value={this.state.comment}
+                        placeholder="コメントを入力..." 
+                        className="textform"
+                        onChange={(form, url) => this.handleChange(form, url)}></textarea>
+            </div>
+          </form>
+        </Row>
       </div>
     );
   }
@@ -188,9 +300,11 @@ class UpForm extends Component {
 class Header extends Component {
   render() {
     return (
-      <header>
-      <h1>画像アップローダ</h1>
-      </header>
+      <Row><Col md={12}>
+        <header>
+          <h2 className="text-center">○○&△△'s Wedding</h2>
+        </header>
+      </Col></Row>
     );
   }
 }
@@ -198,10 +312,12 @@ class Header extends Component {
 class App extends Component {
   render() {
     return (
-      <div className="App">
-      <Header />
-      <UpForm />
-      </div>
+      <Grid>
+        <div className="App">
+          <Header />
+          <UpForm />
+        </div>
+      </Grid>
     );
   }
 }
