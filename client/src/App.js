@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import {Grid, Row, Col} from 'react-bootstrap';
-// import Hammer from 'react-hammerjs';
 import { Animate } from 'react-move';
 import { easePolyIn } from 'd3-ease';  // For react-move
 import './App.css';
@@ -127,21 +126,9 @@ class ImagePreview extends Component {
 
   render() {
     if (this.props.fileUrl) {
-      // const options = {
-      //   touchAction: 'compute',
-      //   recognizers: {
-      //     pan: {
-      //       enable: true,
-      //       // direction: 'DIRECTION_ALL', // direction peroperty does not work somehow
-      //       threshold: 10,
-      //     }
-      //   }
-      // };
 
       return (
         <Col md={12}>
-          {/* <Hammer onPan={this.onPan.bind(this)}
-              options={options}> */}
           <Animate
             start={() => ({
               y: 0,
@@ -163,7 +150,6 @@ class ImagePreview extends Component {
             {(innerState) => (
             <div id='preview' class="text-center"
             style={{
-              // position: 'absolute',
               transform: `translate(0, ${innerState.y}px)`,
               WebkitTransform: `translate(0, ${innerState.y}px)`,
               opacity: innerState.opacity
@@ -176,7 +162,6 @@ class ImagePreview extends Component {
             </div>
           )}
           </Animate>
-          {/* </Hammer> */}
         </Col>
         
       );
