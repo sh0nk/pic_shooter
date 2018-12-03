@@ -16,10 +16,10 @@ class Post extends Component {
     var imageLarge = '';
     if (this.props.post.filename) {
       image = (<img src={`http://${apiHostPort}/api/file/${this.props.post.filename}`}
-                    class="slide__img slide__img--small"
+                    className="slide__img slide__img--small"
                     alt={this.props.post.filename} />);
       imageLarge = (<img src={`http://${apiHostPort}/api/file/${this.props.post.filename}`}
-                    class="slide__img slide__img--large"
+                    className="slide__img slide__img--large"
                     alt={this.props.post.filename} />);
     }
     var comment = this.props.post.comment;
@@ -27,22 +27,22 @@ class Post extends Component {
       comment = 'no message';
     }
     return (
-      <div class="slide">
-        <h2 class="slide__title slide__title--preview">#{this.props.propKey} <span class="slide__message">{comment}</span></h2>
-        <div class="slide__item">
-          <div class="slide__inner">
+      <div className="slide">
+        <h2 className="slide__title slide__title--preview">#{this.props.propKey} <span className="slide__message">{comment}</span></h2>
+        <div className="slide__item">
+          <div className="slide__inner">
             {image}
-            <button class="action action--open" aria-label="View details"></button>
-            {/* <button class="action action--open" aria-label="View details" style='display: none;'></button> */}
+            {/* <button className="action action--open" aria-label="View details" style='display: none;'></button> */}
+            <button className="action action--open" aria-label="View details"></button>
           </div>
         </div>
-        <div class="slide__content">
-          <div class="slide__content-scroller">
+        <div className="slide__content">
+          <div className="slide__content-scroller">
             {imageLarge}
-            <div class="slide__details">
-              <h2 class="slide__title slide__title--main">#{this.props.propKey}</h2>
+            <div className="slide__details">
+              <h2 className="slide__title slide__title--main">#{this.props.propKey}</h2>
               <div>
-                <span class="slide__message slide__message--large">{comment}</span>
+                <span className="slide__message slide__message--large">{comment}</span>
               </div>
             </div>
           </div>
@@ -53,13 +53,20 @@ class Post extends Component {
 }
 
 class List extends Component {
-  // 書き込みリスト
   render() {
     const posts = this.props.posts;
+    const idx = this.props.idx;
     var list = [];
-    // for (var i in posts.slice(0, 5)) {  // FIXME
-    for (var i in posts) {  // FIXME
-        list.push( <Post key={i} propKey={i} post={posts[i]} /> );
+
+    // FIXME: just a test
+    if (posts === null || posts.length < 1) {
+      return list;
+    }
+
+    // for (var i = 0; i < 5; i++) {  // FIXME
+    for (var i = 0; i < posts.length; i++) {  // FIXME
+        // for (var i in posts) {  // FIXME
+        list.push( <Post key={i} propKey={idx[i]} post={posts[i]} /> );
     }
     return (list);
   }
@@ -69,9 +76,11 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      posts: []
+      posts: [],
+      idx: []
     };
     this.updatePosts();
+    this.CircleSlideshow = null;
 
     this.socket = io(ioHostPort);
     this.socket.on('image received', filename => {
@@ -86,7 +95,9 @@ class App extends Component {
 
           // TODO: change to load only one target image?
           if (receiptData != null && receiptData.length === 1) {
-            this.prependNewImage(filename, receiptData[0].comment);
+            // reset contents once
+            this.prependNewImageAfterShuffling(filename, receiptData[0].comment);
+            // this.setState({posts: posts});
           } else {
             console.log("metadata has something wrong.");
           }
@@ -97,35 +108,86 @@ class App extends Component {
     this.updatePosts = this.updatePosts.bind(this);
   }
 
-  prependNewImage(filename, comment) {
+  prependNewImageAfterShuffling(filename, comment) {
     console.log('prepend');
     const posts = this.state.posts.slice();
-    posts.unshift({
+    const newIndex = posts.length;
+
+    var idx = this.shuffle(Array.from({length: posts.length}, (v, k) => k));
+    var orderedArray = [];
+    for (var i = 0; i < posts.length; i++) {
+      orderedArray.push(posts[idx[i]]);
+    }
+    orderedArray.unshift({
       filename: filename,
       comment: comment,
     });
-    this.setState({posts: posts});
+    idx.unshift(newIndex);
+
+    // force reset the rendered slides
+    this.setState({posts: []});
+
+    this.setState({
+      posts: orderedArray, 
+      idx: idx,
+    });
   }
 
   updatePosts(e) {
     getPostList((data) => {
+      // assume data is not null
       console.log('set state');
       console.log(data);
-      this.setState({posts: data});
+      
+      this.setPostWithShuffling(data);
     });
+  }
+
+  setPostWithShuffling(posts) {
+    var idx = this.shuffle(Array.from({length: posts.length}, (v, k) => k));
+    var orderedArray = [];
+    for (var i = 0; i < posts.length; i++) {
+      orderedArray.push(posts[idx[i]]);
+    }
+    this.setState({
+      posts: orderedArray, 
+      idx: idx,
+    });
+  }
+
+  shuffle(array) {
+    var n = array.length, t, i;
+    while (n) {
+      i = Math.floor(Math.random() * n--);
+      t = array[n];
+      array[n] = array[i];
+      array[i] = t;
+    }
+    return array;
   }
 
   componentDidUpdate() {
     var el = document.getElementById('slideshow');
     document.documentElement.className = 'js';
-    new window.CircleSlideshow(el);
+    this.CircleSlideshow = new window.CircleSlideshow(el);
+  }
+
+  componentWillUpdate() {
+    console.log('componentWillUpdate called');
+    // Since these components are not under control by React
+    document.querySelectorAll('.navbutton').forEach((el) => {
+      el.remove();
+    });
+    document.querySelectorAll('.deco').forEach((el) => {
+      el.remove();
+    });
   }
 
   render() {
     return (
       <span>
         <div id="slideshow" class="slideshow">
-          <List posts={this.state.posts}/>
+          <List posts={this.state.posts} idx={this.state.idx}/>
           <button class="action action--close" aria-label="Close"><i class="fa fa-close"></i></button>
         </div>
         {/* {new window.CircleSlideshow(document.getElementById('slideshow'))} */}

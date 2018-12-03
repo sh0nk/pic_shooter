@@ -49,7 +49,7 @@
 			var itemsTotal = items.length;
 			console.log("itemsTotal: " + itemsTotal);
 	
-			if( this.itemsTotal < 2 ) return;
+			if ( itemsTotal < 2 ) return;
 
 			this.items = items;
 			this.itemsTotal = itemsTotal;
@@ -67,6 +67,11 @@
 			this.isClosed = true;
 	
 			this._init();
+
+			// Start slides from opening the top one
+			setTimeout(() => {
+				this._openContent(this.items[this.current]);
+			}, 100);
 		}
 	}
 
