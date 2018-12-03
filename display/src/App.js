@@ -13,14 +13,40 @@ const ioHostPort = process.env.REACT_APP_API_ADDR;
 class Post extends Component {
   render() {
     var image = '';
+    var imageLarge = '';
     if (this.props.post.filename) {
       image = (<img src={`http://${apiHostPort}/api/file/${this.props.post.filename}`}
+                    class="slide__img slide__img--small"
+                    alt={this.props.post.filename} />);
+      imageLarge = (<img src={`http://${apiHostPort}/api/file/${this.props.post.filename}`}
+                    class="slide__img slide__img--large"
                     alt={this.props.post.filename} />);
     }
+    var comment = this.props.post.comment;
+    if (!comment || comment.length === 0) {
+      comment = 'no message';
+    }
     return (
-      <div className="comment">
-        <div>{this.props.post.comment}</div>
-        {image}
+      <div class="slide">
+        <h2 class="slide__title slide__title--preview">#{this.props.propKey} <span class="slide__message">{comment}</span></h2>
+        <div class="slide__item">
+          <div class="slide__inner">
+            {image}
+            <button class="action action--open" aria-label="View details"></button>
+            {/* <button class="action action--open" aria-label="View details" style='display: none;'></button> */}
+          </div>
+        </div>
+        <div class="slide__content">
+          <div class="slide__content-scroller">
+            {imageLarge}
+            <div class="slide__details">
+              <h2 class="slide__title slide__title--main">#{this.props.propKey}</h2>
+              <div>
+                <span class="slide__message slide__message--large">{comment}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -31,21 +57,11 @@ class List extends Component {
   render() {
     const posts = this.props.posts;
     var list = [];
-    for (var i in posts) {
-      list.push( <li key={i}><Post post={posts[i]} /></li> );
+    // for (var i in posts.slice(0, 5)) {  // FIXME
+    for (var i in posts) {  // FIXME
+        list.push( <Post key={i} propKey={i} post={posts[i]} /> );
     }
-    return (<ul>{list}</ul>);
-  }
-}
-
-
-class Header extends Component {
-  render() {
-    return (
-      <header>
-      <h1>画像表示用</h1>
-      </header>
-    );
+    return (list);
   }
 }
 
@@ -99,13 +115,22 @@ class App extends Component {
     });
   }
 
+  componentDidUpdate() {
+    var el = document.getElementById('slideshow');
+    document.documentElement.className = 'js';
+    new window.CircleSlideshow(el);
+  }
+
   render() {
-    // this.updatePosts();
     return (
-      <div className="App">
-      <Header />
-      <List posts={this.state.posts}/>
-      </div>
+      <span>
+        <div id="slideshow" class="slideshow">
+          <List posts={this.state.posts}/>
+          <button class="action action--close" aria-label="Close"><i class="fa fa-close"></i></button>
+        </div>
+        {/* {new window.CircleSlideshow(document.getElementById('slideshow'))} */}
+        {/* <script type='javascript' dangerouslySetInnerHTML={{ __html: script }}></script> */}
+      </span>
     );
   }
 }

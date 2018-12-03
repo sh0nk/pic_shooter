@@ -1,35 +1,9 @@
 body {
-  margin: 0;
-  padding: 50px;
+  /* margin: 0;
+  padding: 50px; */
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 header {
     margin-bottom:40px;
-}
-
-ul {
-    list-style: none;
-}
-
-nav ul {
-    display:flex;
-}
-
-nav ul li {
-    margin-right: 20px;
-}
-
-.kakikomi {
-    border: 1px solid #888;
-    padding:20px;
-    margin-bottom: 40px;
-}
-
-.kakikomi div {
-}
-
-.kakikomi .name {
-    font-size:0.8em;
-    color: #555;
 }
