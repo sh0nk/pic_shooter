@@ -13,6 +13,11 @@
 	'use strict';
 	console.log("main.js called");
 
+	var FIRST_POPUP_OPEN_DELAY_MS = 100;
+	var FIRST_POPUP_CLOSE_DELAY_MS = 6000;
+	var SLIDESHOW_MOVE_DELAY_MS = 5000;
+	var SLIDESHOW_MOVE_FUZZY_MS= 100;
+
 	var bodyEl = document.body,
 		docElem = window.document.documentElement,
 		// http://stackoverflow.com/a/1147768
@@ -58,7 +63,6 @@
 			this.options = extend( {}, this.options );
 			extend( this.options, options );
 	
-	
 			// content close control
 			this.closeCtrl = this.el.querySelector('.action--close');
 			// index of current slide
@@ -71,7 +75,7 @@
 			// Start slides from opening the top one
 			setTimeout(() => {
 				this._openContent(this.items[this.current]);
-			}, 100);
+			}, FIRST_POPUP_OPEN_DELAY_MS);
 		}
 	}
 
@@ -273,6 +277,10 @@
 				type: dynamics.bezier, points: [{"x":0,"y":0,"cp":[{"x":0.2,"y":1}]},{"x":1,"y":1,"cp":[{"x":0.3,"y":1}]}], duration: 1000
 			}
 		);
+
+		setTimeout(() => {
+			this._navigate('right');
+		}, SLIDESHOW_MOVE_DELAY_MS);
 	};
 
 	CircleSlideshow.prototype._moveCircles = function(dir) {
@@ -390,6 +398,9 @@
 			}
 		);
 
+		setTimeout(() => {
+			this._closeContent(item);
+		}, FIRST_POPUP_CLOSE_DELAY_MS);
 	};
 
 	CircleSlideshow.prototype._closeContent = function() {
@@ -474,6 +485,10 @@
 				type: dynamics.bezier, points: [{"x":0,"y":0,"cp":[{"x":0.5,"y":1}]},{"x":1,"y":1,"cp":[{"x":0.5,"y":1}]}], duration: 700, delay: 250
 			}
 		);
+
+		setTimeout(() => {
+			this._navigate('right');
+		}, SLIDESHOW_MOVE_DELAY_MS);
 	};
 
 	window.CircleSlideshow = CircleSlideshow;
