@@ -32,6 +32,7 @@ class ImageAttach extends Component {
 
   resizeImage = (file) => {
     console.log('resizing file' + file);
+    // FIXME: exif orientation https://qiita.com/simiraaaa/items/ee243b69bb0e52af069a
     
     var img = document.createElement("img");
     var reader = new FileReader();
