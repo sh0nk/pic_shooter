@@ -28,7 +28,7 @@ class Post extends Component {
     }
     return (
       <div className="slide">
-        <h2 className="slide__title slide__title--preview">#{this.props.propKey} <span className="slide__message">{comment}</span></h2>
+        <h2 className="slide__title slide__title--preview">#{this.props.propKey + 1}/{this.props.propListNum} <span className="slide__message">{comment}</span></h2>
         <div className="slide__item">
           <div className="slide__inner">
             {image}
@@ -40,7 +40,7 @@ class Post extends Component {
           <div className="slide__content-scroller">
             {imageLarge}
             <div className="slide__details">
-              <h2 className="slide__title slide__title--main">#{this.props.propKey}</h2>
+              <h2 className="slide__title slide__title--main">#{this.props.propKey + 1}/{this.props.propListNum}</h2>
               <div>
                 <span className="slide__message slide__message--large">{comment}</span>
               </div>
@@ -58,15 +58,12 @@ class List extends Component {
     const idx = this.props.idx;
     var list = [];
 
-    // FIXME: just a test
     if (posts === null || posts.length < 1) {
       return list;
     }
 
-    // for (var i = 0; i < 5; i++) {  // FIXME
-    for (var i = 0; i < posts.length; i++) {  // FIXME
-        // for (var i in posts) {  // FIXME
-        list.push( <Post key={i} propKey={idx[i]} post={posts[i]} /> );
+    for (var i = 0; i < posts.length; i++) {
+        list.push( <Post key={i} propKey={idx[i]} propListNum={posts.length} post={posts[i]} /> );
     }
     return (list);
   }
@@ -186,12 +183,10 @@ class App extends Component {
   render() {
     return (
       <span>
-        <div id="slideshow" class="slideshow">
+        <div id="slideshow" className="slideshow">
           <List posts={this.state.posts} idx={this.state.idx}/>
-          <button class="action action--close" aria-label="Close"><i class="fa fa-close"></i></button>
+          <button className="action action--close" aria-label="Close"><i className="fa fa-close"></i></button>
         </div>
-        {/* {new window.CircleSlideshow(document.getElementById('slideshow'))} */}
-        {/* <script type='javascript' dangerouslySetInnerHTML={{ __html: script }}></script> */}
       </span>
     );
   }

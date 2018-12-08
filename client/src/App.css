@@ -78,9 +78,9 @@ img {
     display: inline-block;
     padding: 0.5em 1.5em;
     text-decoration: none;
-    color: #fff;
-    border: solid 2px #fff;
-    background-color: #888;
+    color: #888;
+    border: solid 2px #555;
+    background-color: #333;
     border-radius: 3px;
     transition: .4s;
 }

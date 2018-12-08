@@ -11,6 +11,8 @@ var multer  = require('multer');  // multipart form handling
 var Grid = require('gridfs-stream');
 var GridFsStorage = require('multer-gridfs-storage');
 
+var DELAY_EMITTING_NOTIFICATION_MS = 3000;
+
 require('dotenv').config();
 
 
@@ -79,7 +81,9 @@ let storage = GridFsStorage({
   file: (req, file) => {
     return new Promise((resolve, reject) => {
       const filename = 'file_' + Date.now() + path.extname(file.originalname);
-      io.emit('image received', filename);
+      setTimeout(() => {
+        io.emit('image received', filename);
+      }, DELAY_EMITTING_NOTIFICATION_MS);
       console.log('image received! file:' + filename);
 
       resolve({
