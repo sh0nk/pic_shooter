@@ -1,8 +1,8 @@
 html, body {
     height: 100%;
     width: 100%;
-    overflow: hidden;
-    position: fixed;
+    /* overflow: hidden;
+    position: fixed; */
 }
 
 body {
@@ -48,6 +48,7 @@ header {
 }
 
 #preview {
+    margin-bottom: 1em;
     max-width: 100%;
     width: 100%;
     max-height: 80%;
@@ -78,8 +79,7 @@ img {
     display: inline-block;
     padding: 0.5em 1.5em;
     text-decoration: none;
-    color: #888;
-    border: solid 2px #555;
+    color: #ccc;
     background-color: #333;
     border-radius: 3px;
     transition: .4s;

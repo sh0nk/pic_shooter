@@ -4,7 +4,7 @@
 	/* Heart in a tree */
 	background: url('https://images.pexels.com/photos/255441/pexels-photo-255441.jpeg?cs=srgb&dl=art-background-blur-255441.jpg&fm=jpg&?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260') no-repeat center top;
 	/* Pink */
-	background: url('https://images.pexels.com/photos/414660/pexels-photo-414660.jpeg?cs=srgb&dl=bloom-blooming-blossom-414660.jpg&fm=jpg&fm=jpg&?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260') no-repeat center top;
+	/* background: url('https://images.pexels.com/photos/414660/pexels-photo-414660.jpeg?cs=srgb&dl=bloom-blooming-blossom-414660.jpg&fm=jpg&fm=jpg&?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260') no-repeat center top; */
 	/* background-size: 100%; */
 	background-position: center center;
     background-size: cover;
@@ -182,21 +182,54 @@
 
 .slide__img {
 	position: relative;
-	height: 60vh;
 	display: block;
+	border: 10px solid #fff;
+	box-shadow: 0 0 0 1px #ccc,1px 3px 8px 0 rgba(40,40,40,0.3);
+
 	/* margin: 0 auto; */
 	/* text-align: center; */
 }
 
+
 .slide__img--small {
+	height: 70vh;
 	/* height: 60vh; */
 }
 
 .slide__img--large {
-	height: 70vh;
+	height: 80vh;
 	/* max-height: 400px; */
 	margin: 0 auto 3em;
 }
+
+.slide__img_left_tilt_small {
+	-moz-transform:rotate(1deg);
+	-webkit-transform:rotate(1deg);
+	-ms-transform:rotate(1deg);
+	transform:rotate(1deg);
+}
+
+.slide__img_left_tilt_large {
+	-moz-transform:rotate(3deg);
+	-webkit-transform:rotate(3deg);
+	-ms-transform:rotate(3deg);
+	transform:rotate(3deg);
+}
+
+.slide__img_right_tilt_small {
+	-moz-transform:rotate(-1deg);
+	-webkit-transform:rotate(-1deg);
+	-ms-transform:rotate(-1deg);
+	transform:rotate(-1deg);
+}
+
+.slide__img_right_tilt_large {
+	-moz-transform:rotate(-3deg);
+	-webkit-transform:rotate(-3deg);
+	-ms-transform:rotate(-3deg);
+	transform:rotate(-3deg);
+}
+
 
 .action {
 	font-size: 1.5em;
@@ -364,11 +397,13 @@
 }
 
 .navbutton--next {
+	opacity: 0;
 	-webkit-transform: translate3d(220px,-125px,0);
 	transform: translate3d(220px,-125px,0);
 }
 
 .navbutton--prev {
+	opacity: 0;
 	-webkit-transform: translate3d(-100%, 0, 0) translate3d(-220px,137px,0);
 	transform: translate3d(-100%, 0, 0) translate3d(-220px,137px,0);
 } /* +12 of difference */

@@ -14,9 +14,12 @@ class Post extends Component {
   render() {
     var image = '';
     var imageLarge = '';
+
+    var tilt_css = shuffle(Array.from(["slide__img_left_tilt_small", "slide__img_left_tilt_large", "slide__img_right_tilt_small", "slide__img_right_tilt_large"]))[0];
+
     if (this.props.post.filename) {
       image = (<img src={`http://${apiHostPort}/api/file/${this.props.post.filename}`}
-                    className="slide__img slide__img--small"
+                    className={`slide__img slide__img--small ${tilt_css}`}
                     alt={this.props.post.filename} />);
       imageLarge = (<img src={`http://${apiHostPort}/api/file/${this.props.post.filename}`}
                     className="slide__img slide__img--large"
@@ -26,9 +29,10 @@ class Post extends Component {
     if (!comment || comment.length === 0) {
       comment = 'no message';
     }
+
     return (
       <div className="slide">
-        <h2 className="slide__title slide__title--preview">#{this.props.propKey + 1}/{this.props.propListNum} <span className="slide__message">{comment}</span></h2>
+        <h2 className="slide__title slide__title--preview"><span className="slide__message"></span></h2>
         <div className="slide__item">
           <div className="slide__inner">
             {image}
@@ -40,9 +44,9 @@ class Post extends Component {
           <div className="slide__content-scroller">
             {imageLarge}
             <div className="slide__details">
-              <h2 className="slide__title slide__title--main">#{this.props.propKey + 1}/{this.props.propListNum}</h2>
+              <h2 className="slide__title slide__title--main"> </h2>
               <div>
-                <span className="slide__message slide__message--large">{comment}</span>
+                <span className="slide__message slide__message--large"></span>
               </div>
             </div>
           </div>
@@ -110,7 +114,7 @@ class App extends Component {
     const posts = this.state.posts.slice();
     const newIndex = posts.length;
 
-    var idx = this.shuffle(Array.from({length: posts.length}, (v, k) => k));
+    var idx = shuffle(Array.from({length: posts.length}, (v, k) => k));
     var orderedArray = [];
     for (var i = 0; i < posts.length; i++) {
       orderedArray.push(posts[idx[i]]);
@@ -141,7 +145,7 @@ class App extends Component {
   }
 
   setPostWithShuffling(posts) {
-    var idx = this.shuffle(Array.from({length: posts.length}, (v, k) => k));
+    var idx = shuffle(Array.from({length: posts.length}, (v, k) => k));
     var orderedArray = [];
     for (var i = 0; i < posts.length; i++) {
       orderedArray.push(posts[idx[i]]);
@@ -150,17 +154,6 @@ class App extends Component {
       posts: orderedArray, 
       idx: idx,
     });
-  }
-
-  shuffle(array) {
-    var n = array.length, t, i;
-    while (n) {
-      i = Math.floor(Math.random() * n--);
-      t = array[n];
-      array[n] = array[i];
-      array[i] = t;
-    }
-    return array;
   }
 
   componentDidUpdate() {
@@ -203,6 +196,18 @@ function getOnePost(filename, callback) {
     .then(response => response.json())
     .then((data) => {callback(data)});
 }
+
+function shuffle(array) {
+  var n = array.length, t, i;
+  while (n) {
+    i = Math.floor(Math.random() * n--);
+    t = array[n];
+    array[n] = array[i];
+    array[i] = t;
+  }
+  return array;
+}
+
 
 export default App;
 

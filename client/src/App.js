@@ -247,6 +247,10 @@ class UpForm extends Component {
         message: '画像を送信しました。',
         filename: ''
       });
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 5000);
     });
   }
 
@@ -265,25 +269,25 @@ class UpForm extends Component {
     });
   }
 
-
   render() {
     return  (
       <div className="form">
-        <Row>
-          <ImageAttach onChange={this.handleFileAttached}/>
-        </Row>
         <Row>
           <ImagePreview fileUrl={this.state.fileUrl}
                         onClick={this.handleSubmit} />
         </Row>
         <Row>
+          <ImageAttach onChange={this.handleFileAttached}/>
+        </Row>
+        <Row>
           <form>
             <div className="text-center">
-              <textarea name="comment" value={this.state.comment}
+              <input name="comment" value={this.state.comment}
                         placeholder="コメントを入力..." 
                         className="textform"
+                        type="hidden"
                         readOnly={this.state.textAreaReadOnly}
-                        onChange={(form, url) => this.handleChange(form, url)}></textarea>
+                        onChange={(form, url) => this.handleChange(form, url)}></input>
               送信がうまくいかない場合や、複数枚送信したい場合はページをリロードして下さい。
             </div>
           </form>
