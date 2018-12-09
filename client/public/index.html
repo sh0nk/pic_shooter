@@ -27,7 +27,14 @@
     <title>React App</title>
   </head>
   <body class="body">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-bootstrap/0.32.4/react-bootstrap.min.js"></script>
+
+		<script>
+			(function() {
+				document.EXIF = EXIF;
+			})();
+		</script>
 
     <noscript>
       You need to enable JavaScript to run this app.

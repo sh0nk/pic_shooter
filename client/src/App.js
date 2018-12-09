@@ -36,11 +36,21 @@ class ImageAttach extends Component {
     
     var img = document.createElement("img");
     var reader = new FileReader();
+
+    var orientation;
+    document.EXIF.getData(file, function(){
+      orientation = file.exifdata.Orientation;
+    });
+
     var onChange = this.props.onChange;
     reader.onload = function(e) {
       img.src = e.target.result;
 
       img.onload = function(e) {
+
+        //アスペクト取得
+        var draw_width, draw_height;
+ 
         var canvas = document.createElement("canvas");
         var ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0);
@@ -58,9 +68,58 @@ class ImageAttach extends Component {
         canvas.width = w;
         canvas.height = h;
         console.log("height " + h + " width " + w);
+
+        // EXIF Orientation
+        draw_width = w;
+        draw_height = h;
+        console.log("EXIF orientation: " + orientation);
+        switch(orientation){
+          case 2:
+            ctx.transform(-1, 0, 0, 1, w, 0);
+          break;
+
+          case 3:
+            ctx.transform(-1, 0, 0, -1, w, h);
+          break;
+
+          case 4:
+            ctx.transform(1, 0, 0, -1, 0, h);
+          break;
+
+          case 5:
+            ctx.transform(-1, 0, 0, 1, 0, 0);
+            ctx.rotate((90 * Math.PI) / 180);
+            draw_width = h;
+            draw_height = w;
+          break;
+
+          case 6:
+            ctx.transform(1, 0, 0, 1, w, 0);
+            ctx.rotate((90 * Math.PI) / 180);
+            draw_width = h;
+            draw_height = w;
+          break;
+
+          case 7:
+            ctx.transform(-1, 0, 0, 1, w, h);
+            ctx.rotate((-90 * Math.PI) / 180);
+            draw_width = h;
+            draw_height = w;
+          break;
+
+          case 8:
+            ctx.transform(1, 0, 0, 1, 0, h);
+            ctx.rotate((-90 * Math.PI) / 180);
+            draw_width = h;
+            draw_height = w;
+          break;
+
+          default:
+          break;
+        }
   
         var ctx2 = canvas.getContext("2d");
-        ctx2.drawImage(img, 0, 0, w, h);
+        ctx2.drawImage(img, 0, 0, draw_width, draw_height);
   
         var url = canvas.toDataURL("image/jpeg");
 
