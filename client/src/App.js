@@ -48,26 +48,22 @@ class ImageAttach extends Component {
 
       img.onload = function(e) {
 
-        //アスペクト取得
         var draw_width, draw_height;
  
         var canvas = document.createElement("canvas");
         var ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0);
         var FIXED_WIDTH = 1024;
-        var FIXED_HEIGHT = 768;
         var w = img.width;
         var h = img.height;
-        if (w > h) {
-          h *= FIXED_WIDTH / w;
-          w = FIXED_WIDTH;
-        } else {
-          w *= FIXED_HEIGHT / h;
-          h = FIXED_HEIGHT;
-        }
+        var image_aspect = (orientation === 5 || orientation === 6 || orientation === 7 || orientation === 8)
+         ? w / h : h / w;
+        console.log("height " + h + " width " + w);
+
+        w = FIXED_WIDTH
+        h = w * image_aspect
         canvas.width = w;
         canvas.height = h;
-        console.log("height " + h + " width " + w);
 
         // EXIF Orientation
         draw_width = w;
@@ -136,12 +132,18 @@ class ImageAttach extends Component {
 
     if (image) {
       this.resizeImage(image);
+    }
+  }
+
+  componentWillReceiveProps() {
+    if (this.props.isSubmitActionStarted) {
       this.setState({
-        selectButtonMsg: "写真をタップしてアップロード",
+        selectButtonMsg: "再選択したい場合はページをリロード",
         selectButtonDisabled: true,
         selectButtonId: "imgselect_disabled",
       });
     }
+    
   }
 
   render() {
@@ -212,16 +214,16 @@ class ImagePreview extends Component {
             })}
             >
             {(innerState) => (
-              <div id='preview' class="text-center"
+              <div id='preview' className="text-center"
+                onClick={this.handleClick} 
                 style={{
                   transform: `translate(0, ${innerState.y}px)`,
                   WebkitTransform: `translate(0, ${innerState.y}px)`,
                   opacity: innerState.opacity
                 }}
               >
-                <img src={this.props.fileUrl} alt="preview" id="preview"
-                    onClick={this.handleClick} 
-                />
+                <img src={this.props.fileUrl} alt="preview" id="preview"/>
+                <h3>画像をタップしてアップロード！</h3>
               </div>
             )}
           </Animate>
@@ -250,7 +252,7 @@ class UpForm extends Component {
       fileForm: null,
       fileUrl: null,
       filename: '',
-      textAreaReadOnly: false,
+      isSubmitActionStarted: false,
     };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -284,7 +286,7 @@ class UpForm extends Component {
     e.preventDefault();
 
     console.log("freezing text area");
-    this.setState({ textAreaReadOnly: true });
+    this.setState({ isSubmitActionStarted: true });
 
     this.handleUploadFile();
   }
@@ -336,7 +338,8 @@ class UpForm extends Component {
                         onClick={this.handleSubmit} />
         </Row>
         <Row>
-          <ImageAttach onChange={this.handleFileAttached}/>
+          <ImageAttach onChange={this.handleFileAttached}
+                        isSubmitActionStarted={this.state.isSubmitActionStarted} />
         </Row>
         <Row>
           <form>
@@ -345,7 +348,7 @@ class UpForm extends Component {
                         placeholder="コメントを入力..." 
                         className="textform"
                         type="hidden"
-                        readOnly={this.state.textAreaReadOnly}
+                        readOnly={this.state.isSubmitActionStarted}
                         onChange={(form, url) => this.handleChange(form, url)}></input>
               送信がうまくいかない場合や、複数枚送信したい場合はページをリロードして下さい。
             </div>

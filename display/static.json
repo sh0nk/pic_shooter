@@ -1,0 +1,11 @@
+{
+  "root": "build/",
+  "proxies": {
+    "/api/": {
+      "origin": "${REACT_APP_PROXY_URL}/api"
+    },
+    "/socket.io/": {
+      "origin": "${REACT_APP_PROXY_URL}/socket.io"
+    }
+  }
+}

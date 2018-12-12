@@ -51,8 +51,14 @@ app.use(express.static('public'));
 const mongoHostPort     = process.env.MONGO_ADDR;
 const mongoDatabaseName = process.env.MONGO_DB_NAME;
 const mongoImageCollection = process.env.MONGO_COL_NAME;
+const mongoUser         = process.env.MONGO_USER;
+const mongoPass         = process.env.MONGO_PASS;
 
-const mongoUrl = 'mongodb://' + mongoHostPort + '/' + mongoDatabaseName;
+var mongoUserPass = '';
+if (mongoUser && mongoUser.length !== 0) {
+  mongoUserPass = mongoUser + ':' + mongoPass + '@';
+}
+const mongoUrl = 'mongodb://' + mongoUserPass + mongoHostPort + '/' + mongoDatabaseName;
 
 mongoose.connect(mongoUrl);
 const conn = mongoose.connection;

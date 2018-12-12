@@ -69,6 +69,8 @@
 			this.current = 0;
 			// all items are closed initially
 			this.isClosed = true;
+			// version number to check whether the delayed callback is still valid
+			this.updateVersion = 0;
 	
 			this._init();
 
@@ -145,17 +147,21 @@
 			var keyCode = ev.keyCode || ev.which;
 			switch (keyCode) {
 				case 37:
+					self.updateVersion++;
 					self._navigate('left');
 					break;
 				case 39:
+					self.updateVersion++;
 					self._navigate('right');
 					break;
 				case 13: // enter
 					if( self.isExpanded ) return;
+					self.updateVersion++;
 					self._openContent(self.items[self.current]);
 					break;
 				case 27: // esc
 					if( self.isClosed ) return;
+					self.updateVersion++;
 					self._closeContent();
 					break;
 			}
@@ -186,11 +192,13 @@
 				if ( xDiff > 0 ) {
 					/* left swipe */
 					if( !self.isExpanded ) {
+						self.updateVersion++;
 						self._navigate('right');	
 					}
 				} else {
 					/* right swipe */
 					if( !self.isExpanded ) {
+						self.updateVersion++;
 						self._navigate('left');	
 					}
 				}
@@ -278,7 +286,13 @@
 			}
 		);
 
+		var snapshotVersion = this.updateVersion;
 		setTimeout(() => {
+			console.log('snapshot version:' + snapshotVersion + ' current version:' + this.updateVersion);
+			if (snapshotVersion != this.updateVersion) {
+				console.log('snapshot version is ' + snapshotVersion + ' but the current version is ' + this.updateVersion + ', dropped executing delayed operation.');
+				return;
+			}
 			this._navigate('right');
 		}, SLIDESHOW_MOVE_DELAY_MS);
 	};
@@ -398,7 +412,14 @@
 			}
 		);
 
+		this.updateVersion++;
+		var snapshotVersion = this.updateVersion;
 		setTimeout(() => {
+			console.log('snapshot version:' + snapshotVersion + ' current version:' + this.updateVersion);
+			if (snapshotVersion != this.updateVersion) {
+				console.log('snapshot version is ' + snapshotVersion + ' but the current version is ' + this.updateVersion + ', dropped executing delayed operation.');
+				return;
+			}
 			this._closeContent(item);
 		}, FIRST_POPUP_CLOSE_DELAY_MS);
 	};
@@ -486,7 +507,13 @@
 			}
 		);
 
+		var snapshotVersion = this.updateVersion;
 		setTimeout(() => {
+			console.log('snapshot version:' + snapshotVersion + ' current version:' + this.updateVersion);
+			if (snapshotVersion != this.updateVersion) {
+				console.log('snapshot version is ' + snapshotVersion + ' but the current version is ' + this.updateVersion + ', dropped executing delayed operation.');
+				return;
+			}
 			this._navigate('right');
 		}, SLIDESHOW_MOVE_DELAY_MS);
 	};
